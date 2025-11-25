@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR" id="html-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Faculdade Insted{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <script>
+        // Verificar preferência salva ou usar tema do sistema
+        (function() {
+            const theme = localStorage.getItem('theme') || 
+                         (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            const html = document.getElementById('html-root');
+            if (theme === 'dark') {
+                html.classList.add('dark');
+            }
+        })();
+        
+        function toggleTheme() {
+            const html = document.getElementById('html-root');
+            const isDark = html.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
+    </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-200">
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between py-4 gap-4">
+                <!-- Título e Toggle -->
+                <div class="flex items-center gap-4">
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Faculdade Insted</h1>
+                    <button onclick="toggleTheme()" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" aria-label="Alternar tema">
+                        <svg class="w-5 h-5 text-gray-700 dark:text-gray-300 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        <svg class="w-5 h-5 text-gray-700 dark:text-gray-300 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Filtros -->
+                <div class="flex flex-wrap gap-3">
+                    <form method="get" action="{% url 'homepage' %}" class="flex flex-wrap gap-3">
+                        <!-- Filtro por Semestre -->
+                        <select name="semestre" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 transition-colors">
+                            <option value="">Semestre Atual</option>
+                            {% for semestre in semestres %}
+                                <option value="{{ semestre.id }}" {% if request.GET.semestre == semestre.id|stringformat:"s" or not request.GET.semestre and semestre_selecionado and semestre.id == semestre_selecionado.id %}selected{% endif %}>
+                                    {{ semestre }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        
+                        <!-- Filtro por Curso -->
+                        <select name="curso" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 transition-colors">
+                            <option value="">Todos os Cursos</option>
+                            {% for curso in cursos %}
+                                <option value="{{ curso.id }}" {% if request.GET.curso == curso.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ curso.nome }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        
+                        <!-- Filtro por Andar -->
+                        <select name="andar" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 transition-colors">
+                            <option value="">Todos os Andares</option>
+                            {% for andar in andares %}
+                                <option value="{{ andar.id }}" {% if request.GET.andar == andar.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ andar }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        
+                        <!-- Filtro por Lugares Livres -->
+                        <select name="lugares_livres" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 transition-colors">
+                            <option value="">Todas as Salas</option>
+                            <option value="sim" {% if request.GET.lugares_livres == "sim" %}selected{% endif %}>Com Lugares Livres</option>
+                            <option value="nao" {% if request.GET.lugares_livres == "nao" %}selected{% endif %}>Sem Lugares Livres</option>
+                        </select>
+                        
+                        <button type="submit" class="px-6 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors font-medium">
+                            Filtrar
+                        </button>
+                        
+                        {% if request.GET.curso or request.GET.andar or request.GET.lugares_livres or request.GET.semestre %}
+                            <a href="{% url 'homepage' %}" class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium">
+                                Limpar
+                            </a>
+                        {% endif %}
+                    </form>
+                    <!-- Botão Exportar Excel -->
+                    <a href="{% url 'exportar_excel' %}?{{ request.GET.urlencode }}" class="px-6 py-2 bg-green-600 dark:bg-green-500 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition-colors font-medium flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Exportar Excel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% block content %}
+        {% endblock %}
+    </main>
+</body>
+</html>
+
