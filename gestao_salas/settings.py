@@ -75,24 +75,38 @@ WSGI_APPLICATION = 'gestao_salas.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-# Try to use dj_database_url if available (for production)
-try:
-    import dj_database_url
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=os.environ.get('DATABASE_URL', 'sqlite:///db.sqlite3'),
-            conn_max_age=600
-        )
-    }
-except ImportError:
-    # Fallback to SQLite for local development
+# Try to use DATABASE_URL from environment (Render), otherwise use direct config
+if os.environ.get('DATABASE_URL'):
+    try:
+        import dj_database_url
+        DATABASES = {
+            'default': dj_database_url.config(
+                default=os.environ.get('DATABASE_URL'),
+                conn_max_age=600
+            )
+        }
+    except ImportError:
+        # Fallback to direct PostgreSQL config
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql_psycopg2',
+                'NAME': os.environ.get('DB_NAME', 'insted_db'),
+                'USER': os.environ.get('DB_USER', 'admin'),
+                'PASSWORD': os.environ.get('DB_PASSWORD', '3jhBfdVMcRzxQkZU5HpqQqRbtAuuEPuj'),
+                'HOST': os.environ.get('DB_HOST', 'dpg-d4ijq6i4d50c73d526a0-a.oregon-postgres.render.com'),
+                'PORT': os.environ.get('DB_PORT', '5432'),
+            }
+        }
+else:
+    # Use direct PostgreSQL configuration
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'insted_db',
+            'USER': 'admin',
+            'PASSWORD': '3jhBfdVMcRzxQkZU5HpqQqRbtAuuEPuj',
+            'HOST': 'dpg-d4ijq6i4d50c73d526a0-a.oregon-postgres.render.com',
+            'PORT': '5432',
         }
     }
 
