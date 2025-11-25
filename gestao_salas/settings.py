@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'gestao_salas.wsgi.application'
 # Try to use DATABASE_URL from environment (Render), otherwise use direct config
 if os.environ.get('DATABASE_URL'):
     try:
-        import dj_database_url
+        import dj_database_url  # type: ignore
         DATABASES = {
             'default': dj_database_url.config(
                 default=os.environ.get('DATABASE_URL'),
