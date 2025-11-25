@@ -70,10 +70,21 @@ def homepage(request):
     
     # Filtrar cursos apenas do semestre selecionado para o dropdown
     if semestre_selecionado:
-        cursos_filtrados = Curso.objects.filter(semestre_periodo=semestre_selecionado).order_by('nome')
+        cursos_filtrados = (
+            Curso.objects
+            .filter(semestre_periodo=semestre_selecionado)
+            .values('nome')
+            .distinct()
+            .order_by('nome')
+        )
     else:
-        cursos_filtrados = Curso.objects.filter(semestre_periodo__isnull=False).order_by('nome')
-    
+        cursos_filtrados = (
+            Curso.objects
+            .filter(semestre_periodo_isnull=False)
+            .values('nome')
+            .distinct()
+            .order_by('nome')
+        )
     context = {
         'andares_com_salas': andares_com_salas,
         'cursos': cursos_filtrados,
