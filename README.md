@@ -1,135 +1,181 @@
-# Sistema de Gestão de Salas - Faculdade Insted
+# 🏫 Sistema de Gestão de Espaços - Faculdade Insted
 
-Sistema web desenvolvido em Django para gerenciamento de salas, cursos e ocupação de espaços da Faculdade Insted.
+Sistema web para gerenciamento de salas e espaços acadêmicos com backup automático.
 
-## 🚀 Funcionalidades
+## 🌐 Servidor de Rede Local
 
-- **Gestão de Andares**: Organize salas por andares
-- **Gestão de Cursos**: Cadastre cursos com semestre, turma e quantidade de alunos
-- **Gestão de Salas**: Controle de lugares disponíveis por sala
-- **Sistema de Semestres**: Organize dados por período acadêmico (ex: 2025.1, 2025.2)
-- **Filtros Avançados**: 
-  - Por semestre acadêmico
-  - Por curso
-  - Por andar
-  - Por disponibilidade de lugares
-- **Tema Escuro/Claro**: Interface com suporte a tema escuro
-- **Exportação para Excel**: Exporte relatórios filtrados para Excel
+Este sistema está configurado para funcionar em **rede local**, permitindo acesso de qualquer dispositivo na rede.
 
-## 🛠️ Tecnologias
+### 🚀 Iniciar Servidor
 
-- **Django 5.2.6**: Framework web Python
-- **Tailwind CSS**: Framework CSS para estilização
-- **SQLite**: Banco de dados
-- **openpyxl**: Geração de arquivos Excel
+```bash
+# Opção 1: Script otimizado (RECOMENDADO)
+python iniciar_servidor.py
 
-## 📋 Pré-requisitos
+# Opção 2: Script completo
+python runserver_com_backup.py
 
+# Opção 3: Django básico (sem backup)
+python manage.py runserver 0.0.0.0:8000
+```
+
+### 📱 Como Acessar
+
+**No computador servidor:**
+- http://localhost:8000
+
+**De outros dispositivos na rede:**
+- http://IP_DO_SERVIDOR:8000
+- Exemplo: http://192.168.1.100:8000
+
+> O IP será mostrado ao iniciar o servidor
+
+## ✨ Funcionalidades
+
+### 📚 Gestão de Salas
+- Visualização por andar
+- Filtros por curso, metodologia, disponibilidade
+- Informações em tempo real de ocupação
+
+### 🎯 Metodologias de Ensino
+- **Metodologia Ativa** - Salas com ensino interativo
+- **Metodologia Tradicional** - Salas com ensino convencional
+
+### 📊 Sistema de Filtros
+- Semestre/Período
+- Curso específico
+- Andar do prédio
+- Tipo de metodologia
+- Disponibilidade de lugares
+
+### 📦 Backup Automático
+- Backup do banco SQLite a cada 1 hora
+- Rotação automática (mantém 24 backups)
+- Logs detalhados em `logs/backup_sqlite.log`
+- Backups salvos em `backups_sqlite/`
+
+## 🛠️ Configuração
+
+### Requisitos
 - Python 3.8+
-- pip
+- Django 5.2+
+- SQLite (incluído no Python)
 
-## 🔧 Instalação
-
-1. Clone o repositório:
+### Instalação
 ```bash
-git clone https://github.com/VitorAngelozi/gestao_insted.git
-cd gestao_insted
-```
+# 1. Instalar dependências
+pip install -r requirements.txt
 
-2. Instale as dependências:
-```bash
-pip install django openpyxl
-```
-
-3. Execute as migrações:
-```bash
+# 2. Executar migrações
 python manage.py migrate
+
+# 3. Iniciar servidor
+python iniciar_servidor.py
 ```
 
-4. Crie um superusuário (opcional):
+## 📋 Comandos de Backup
+
 ```bash
-python manage.py createsuperuser
+# Ver status do backup
+python manage.py backup_automatico --status
+
+# Fazer backup manual
+python manage.py backup_automatico --backup-now
+
+# Iniciar backup automático
+python manage.py backup_automatico --start
+
+# Parar backup automático
+python manage.py backup_automatico --stop
 ```
 
-5. Execute o servidor:
-```bash
-python manage.py runserver
-```
+## 🔧 Administração
 
-6. Acesse no navegador:
-```
-http://127.0.0.1:8000
-```
+### Acessar Admin
+- URL: http://localhost:8000/admin/
+- Usuário: admin
+- Senha: admin123
 
-## 📁 Estrutura do Projeto
+### Gerenciar Dados
+- **Andares:** Definir pisos do prédio
+- **Cursos:** Cadastrar cursos e turmas
+- **Salas:** Adicionar salas com metodologia
+- **Períodos:** Configurar semestres letivos
+
+## 📁 Estrutura de Arquivos
 
 ```
 gestao_espacos/
-├── gestao_salas/          # Configurações do projeto Django
-│   ├── settings.py        # Configurações
-│   ├── urls.py           # URLs principais
-│   └── templates/        # Templates base
-├── sala/                  # App principal
-│   ├── models.py         # Modelos (Andar, Curso, Sala, SemestrePeriodo)
-│   ├── views.py          # Views (homepage, exportar_excel)
-│   ├── admin.py          # Configuração do admin
-│   └── templates/        # Templates do app
-└── manage.py             # Script de gerenciamento Django
+├── gestao_salas/           # Configurações Django
+├── sala/                   # App principal
+│   ├── models.py          # Modelos (Sala, Curso, etc.)
+│   ├── views.py           # Lógica de negócio
+│   └── templates/         # Templates HTML
+├── db.sqlite3             # Banco de dados
+├── backups_sqlite/        # Backups automáticos
+├── logs/                  # Logs do sistema
+├── iniciar_servidor.py    # Script de inicialização
+└── runserver_com_backup.py # Servidor com backup
 ```
 
-## 📊 Modelos
+## 🌙 Tema Escuro/Claro
 
-### SemestrePeriodo
-- Ano e período (1 ou 2)
-- Data de início e fim
-- Status ativo
+O sistema possui **alternância automática** entre tema claro e escuro:
+- Botão de alternância no cabeçalho
+- Preferência salva automaticamente
+- Detecta preferência do sistema
 
-### Andar
-- Número do andar
-- Nome opcional
+## 🎨 Design
 
-### Curso
-- Nome
-- Semestre do curso (1° a 12°)
-- Turma
-- Quantidade de alunos
-- Semestre período (vinculado)
+- **Minimalista e moderno**
+- **Totalmente responsivo** (funciona em celulares)
+- **Cores neutras** com ícone de graduação animado
+- **Interface limpa** focada na funcionalidade
 
-### Sala
-- Nome
-- Quantidade de lugares
-- Curso vinculado
-- Andar
+## 📊 Dados Incluídos
 
-## 🎨 Interface
+O sistema já vem com dados de exemplo:
+- Andares configurados
+- Salas com diferentes metodologias
+- Cursos de exemplo
+- Períodos letivos
 
-- Design moderno e minimalista
-- Responsivo (mobile-friendly)
-- Tema escuro/claro
-- Cards organizados por andar
-- Indicadores visuais de disponibilidade
+## 🔒 Segurança
 
-## 📤 Exportação
+- Backup automático para proteção de dados
+- Logs detalhados de todas as operações
+- Configurações seguras para rede local
+- Acesso administrativo protegido
 
-O sistema permite exportar os dados filtrados para Excel com:
-- Informações completas das salas
-- Formatação condicional (verde/vermelho)
-- Cabeçalhos estilizados
-- Data e hora da exportação
+---
 
-## 👤 Admin
+## 🆘 Suporte
 
-Acesse `/admin` para gerenciar:
-- Semestres Períodos
-- Andares
-- Cursos
-- Salas
+### Problemas Comuns
 
-## 📝 Licença
+**Erro de porta ocupada:**
+```bash
+python iniciar_servidor.py --port 8080
+```
 
-Este projeto é de uso interno da Faculdade Insted.
+**Backup não funciona:**
+```bash
+python manage.py backup_automatico --status
+```
 
-## 👨‍💻 Desenvolvedor
+**Não consegue acessar da rede:**
+- Verificar firewall do Windows
+- Confirmar que o IP está correto
+- Testar com: `python runserver_com_backup.py`
 
-Desenvolvido para a Faculdade Insted
+### Logs Importantes
+- **Servidor:** Console onde executou o comando
+- **Backup:** `logs/backup_sqlite.log`
+- **Django:** Logs no console durante execução
 
+---
+
+**🎓 Desenvolvido para a Faculdade Insted**  
+*Sistema de Gestão de Espaços Acadêmicos*
+
+Última atualização: Janeiro 2025

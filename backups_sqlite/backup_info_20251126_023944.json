@@ -1,0 +1,25 @@
+{
+  "timestamp": "20251126_023944",
+  "datetime": "2025-11-26T02:39:44.431007",
+  "database": {
+    "path": "C:\\Users\\Vitor\\Documents\\gestao_espacos\\db.sqlite3",
+    "backup_file": "db_backup_20251126_023944.sqlite3",
+    "info": {
+      "size_bytes": 176128,
+      "size_mb": 0.16796875,
+      "modified": "2025-11-26 01:55:05.191169",
+      "tables": 15,
+      "total_records": 86
+    }
+  },
+  "files": {
+    "backup_file": null,
+    "included": false
+  },
+  "stats": {
+    "total_backups": 3,
+    "last_backup": "20251126_023944",
+    "last_size": 176128,
+    "errors": 0
+  }
+}
